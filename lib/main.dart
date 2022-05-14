@@ -38,9 +38,9 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: mobileBackgroundColor,
-        textTheme: GoogleFonts.latoTextTheme(
-          Theme.of(context).textTheme,
-        ),
+        // textTheme: GoogleFonts.latoTextTheme(
+        //   Theme.of(context).textTheme,
+        // ),
       ),
       title: 'Instagram',
       // home: const ResponsiveLayout(

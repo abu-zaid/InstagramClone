@@ -1,6 +1,10 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-
+import 'package:image_picker/image_picker.dart';
+import 'package:instagram_flutter/resources/auth_methods.dart';
+import 'package:instagram_flutter/utils/utils.dart.dart';
 import '../utils/colors.dart';
 import '../widgets/text_field_input.dart';
 
@@ -14,9 +18,10 @@ class SignUpScreen extends StatefulWidget {
 class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
-
+  Uint8List? _image;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool _isLoading = false;
 
   get primaryColor => null;
 
@@ -27,6 +32,32 @@ class _SignUpScreenState extends State<SignUpScreen> {
     _passwordController.dispose();
     _bioController.dispose();
     _usernameController.dispose();
+  }
+
+  void signUpUser() async {
+    setState(() {
+      _isLoading = true;
+    });
+    String res = await AuthMethods().signUpUser(
+      email: _emailController.text,
+      username: _usernameController.text,
+      bio: _bioController.text,
+      password: _passwordController.text,
+      file: _image!,
+    );
+    setState(() {
+      _isLoading = false;
+    });
+    if (res != 'success') {
+      showSnackBar(res, context);
+    }
+  }
+
+  void selectImage() async {
+    Uint8List img = await pickImage(ImageSource.gallery);
+    setState(() {
+      _image = img;
+    });
   }
 
   @override
@@ -55,16 +86,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
               Stack(
                 children: [
-                  CircleAvatar(
-                    radius: 64,
-                    backgroundImage: NetworkImage(
-                        'https://images.unsplash.com/photo-1652385698317-b6a5cfc43d86?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=464&q=80'),
-                  ),
+                  _image != null
+                      ? CircleAvatar(
+                          radius: 64,
+                          backgroundImage: MemoryImage(_image!),
+                        )
+                      : const CircleAvatar(
+                          radius: 64,
+                          backgroundImage: NetworkImage(
+                              'https://i.pinimg.com/550x/2b/93/d8/2b93d8b64d3350b1151ac2ef05e89702.jpg'),
+                        ),
                   Positioned(
                     bottom: -10,
                     left: 80,
                     child: IconButton(
-                      onPressed: () {},
+                      onPressed: selectImage,
                       icon: const Icon(
                         Icons.add_a_photo_rounded,
                       ),
@@ -121,12 +157,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 height: 32,
               ),
               //LoginButton
-              GestureDetector(
-                onTap: () {
-                  print("Login");
-                },
+              InkWell(
+                onTap: signUpUser,
                 child: Container(
-                  child: const Text("Login"),
+                  child: _isLoading
+                      ? const Center(
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text("Sign Up"),
                   width: double.infinity,
                   alignment: Alignment.center,
                   padding: const EdgeInsets.symmetric(vertical: 12),
@@ -146,25 +186,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
               //SignUp
 
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    child: const Text("Don't have an account yet?"),
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                  ),
-                  GestureDetector(
-                    onTap: () {},
-                    child: Container(
-                      child: const Text(
-                        "Sign Up!",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                    ),
-                  ),
-                ],
-              )
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.center,
+              //   children: [
+              //     Container(
+              //       child: const Text("Don't have an account yet?"),
+              //       padding: const EdgeInsets.symmetric(vertical: 8),
+              //     ),
+              //     GestureDetector(
+              //       onTap: () {},
+              //       child: Container(
+              //         child: const Text(
+              //           "Sign Up!",
+              //           style: TextStyle(fontWeight: FontWeight.bold),
+              //         ),
+              //         padding: const EdgeInsets.symmetric(vertical: 8),
+              //       ),
+              //     ),
+              //   ],
+              // )
             ],
           ),
         ),
