@@ -23,8 +23,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
 
-  get primaryColor => null;
-
   @override
   void dispose() {
     super.dispose();
